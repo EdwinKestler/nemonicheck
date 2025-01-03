@@ -1,0 +1,146 @@
+# BIP39 Seed Checker for Legacy (P2PKH) Addresses
+
+This repository contains a Python script that:
+
+1. Validates or checks BIP39 mnemonics (seed phrases).  
+2. Derives legacy (P2PKH) addresses following the **m/44'/0'/0'/0/i** path for Bitcoin mainnet.  
+3. Queries the [Blockstream Explorer API](https://blockstream.info/) to determine if any derived addresses have received funds (i.e., a non-zero funded sum).
+
+---
+
+## Table of Contents
+
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Example Output](#example-output)
+- [Security and Disclaimers](#security-and-disclaimers)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
+## Features
+
+- **BIP39 Validation**: Uses the [`mnemonic`](https://pypi.org/project/mnemonic/) package to validate your 12-word or 24-word mnemonic seed phrase.  
+- **HD Wallet Derivation**: Uses the [`bip_utils`](https://pypi.org/project/bip_utils/) library for BIP44 derivation of legacy addresses (Bitcoin, mainnet).  
+- **Address Balance Check**: Uses the `requests` library to call the Blockstream Explorer API and retrieve transaction/funded amounts for each derived address.  
+- **Debug-Friendly**: Prints out address checks and the server’s raw JSON response for easier troubleshooting.
+
+---
+
+## Installation
+
+1. **Clone** this repository:
+
+    ```bash
+    git clone https://github.com/YourUsername/BIP39-Checker.git
+    cd BIP39-Checker
+    ```
+
+2. **Create** a Python virtual environment (recommended):
+
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate  # On Windows, venv\Scripts\activate
+    ```
+
+3. **Install** dependencies:
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+    
+    Or, if you prefer installing manually:
+
+    ```bash
+    pip install mnemonic bip_utils requests
+    ```
+
+---
+
+## Usage
+
+1. **Edit** the script (if needed) to include your list of seed phrases in the `test_seed_phrases` array. You can also modify `max_addresses` to check more addresses per seed.  
+
+2. **Run** the script:
+
+    ```bash
+    python bip39_check_legacy.py
+    ```
+
+3. **Inspect** the console output to see if any addresses returned a non-zero `funded_txo_sum`.
+
+**Script Overview**:
+
+- `check_address_balance(address)`:  
+  Calls the Blockstream API, prints debug info, and returns the integer amount of how many satoshis have ever been funded to that address.
+
+- `check_seed_for_legacy_addresses(seed_phrase, max_addresses=3)`:  
+  - Validates the BIP39 phrase.  
+  - Derives addresses according to `m/44'/0'/0'/0/i`.  
+  - Checks each address’s funded balance.
+
+- The `if __name__ == "__main__":` block iterates through a list of test seeds and prints results.
+
+---
+
+## Configuration
+
+- **`test_seed_phrases`**: A list of strings, each containing a 12- or 24-word BIP39 mnemonic.  
+- **`max_addresses`**: How many consecutive addresses to check. 5 is typical if you believe the seed owner started from index 0. If you suspect higher usage, increase this number.  
+- **Blockstream API**: The default endpoint is [`https://blockstream.info/api/address/`](https://blockstream.info/). You can change this URL if you prefer another service or run your own [Esplora](https://github.com/Blockstream/esplora).
+
+---
+
+## Example Output
+
+When running the script, you might see logs like:
+
+================================================================================ Checking seed: panel machine enforce hope faith riot virtual lunch faculty cinnamon another pattern
+
+[DEBUG] Checking address: 1G9SCL5... [DEBUG] Server raw response status code: 200 [DEBUG] Server response JSON: { "chain_stats": { "funded_txo_count": 0, "funded_txo_sum": 0, "spent_txo_count": 0, ... }, ... }
+
+[DEBUG] Checking address: 1K6PkfY... [DEBUG] Server raw response status code: 200 [DEBUG] Server response JSON: { "chain_stats": { "funded_txo_count": 2, "funded_txo_sum": 150000, ... }, ... }
+
+[RESULT] Non-empty addresses found for the seed: panel machine enforce hope faith riot ... - Address Index: 1 Address: 1K6PkfY... FundedSum: 150000 satoshis
+
+
+- If `funded_txo_sum > 0`, the address has or had a balance.  
+- If all addresses have a `funded_txo_sum == 0`, you’ll see `[RESULT] No funded addresses found...`
+
+---
+
+## Security and Disclaimers
+
+1. **Security**:
+    - Mnemonics can unlock real Bitcoin (or other coins). **Never** share your seed phrases publicly.  
+    - It is recommended to run this script **offline** or on a secure, air-gapped machine if you are testing real seed phrases that might hold funds.  
+    - These addresses and calls go out to the public Blockstream API, which can log your queries. If privacy is a concern, run your own [Esplora](https://github.com/Blockstream/esplora) or full Bitcoin node.
+
+2. **Liability**:
+    - This code is for **educational and testing** purposes only.  
+    - The authors and contributors are **not** responsible for any loss of funds, misuse, or other issues arising from use of this software.
+
+3. **Testing**:
+    - If you want to safely experiment, use **Testnet** seeds and addresses (i.e., set `Bip44Coins.BITCOIN_TESTNET` instead) or use ephemeral test seeds with zero real funds.
+
+---
+
+## Contributing
+
+1. **Fork** this repository.  
+2. **Create a feature branch** (`git checkout -b feature/new-feature`).  
+3. **Commit** your changes (`git commit -am 'Add new feature'`).  
+4. **Push** to your fork (`git push origin feature/new-feature`).  
+5. **Open a Pull Request** and describe your changes.
+
+Feel free to open issues or pull requests to help improve the script, fix bugs, or add additional functionality (e.g. deriving taproot addresses, supporting other BIP44 coins, multi-threading, etc.).
+
+---
+
+## License
+
+This project is released under the **MIT License**. See the [LICENSE](LICENSE) file for details.
+
