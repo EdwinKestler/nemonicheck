@@ -1,0 +1,52 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.pyd
+*.pyo
+*.pyc
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual Environments
+venv/
+.venv/
+ENV/
+env.bak/
+env/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# Mac files
+.DS_Store
+
+# Miscellaneous
+*.swp
+*.swo
