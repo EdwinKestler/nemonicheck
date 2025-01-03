@@ -33,6 +33,8 @@ venv/
 ENV/
 env.bak/
 env/
+# If your environment is named “nemonic”
+nemonic/
 
 # Spyder project settings
 .spyderproject
